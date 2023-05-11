@@ -17,4 +17,13 @@ Once you're in MySql, run:
 > - last step is to run: npm start
 >
 
-Usage: 
+## Usage 
+Check out this link to watch a demo of the application! 
+> https://drive.google.com/file/d/1fv2pFV_8bAgMvRQN1C5_GiT7Am0zPHa3/view
+>
+
+## Credits 
+N/A 
+
+## License 
+N/A

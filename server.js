@@ -25,6 +25,7 @@ db.connect((error) => {
         console.log("Can't connect to database", error);
     }else{
         console.log('Connected to the database')
+        ;
     }
 })
 
@@ -130,7 +131,11 @@ const workPrompts = () => {
                                 const table = formatEmployeesTable(employees)
                                 console.log(table);
                                 workPrompts()
-                            });
+                            })
+                            .catch((error) =>{
+                                console.error('Could not get the employees', error)
+                                workPrompts();
+                            })
                 break;
                 case 'AddEmployee':
                     inquirer
@@ -284,7 +289,7 @@ const formatRolesTable = (roles) => {
 
 const getAllEmployees = () => {
     return new Promise ((resolve, reject) => {
-        const query = 'SELECT employee_id, first_name, last_name, role_name, department, salary, manager FROM employees'; 
+        const query = 'SELECT employee_id, first_name, last_name, role, department, salary, manager FROM employees'; 
 
         db.query(query, (error, employees) => {
             if(error) {
@@ -296,17 +301,17 @@ const getAllEmployees = () => {
         })
 }
 
-const formatEmployeesTable = employees => {
+const formatEmployeesTable = (employees) => {
     const formattedEmployees = employees.map((employee) => ({
         'Employee ID': employee.employee_id, 
         'Employee First Name': employee.first_name,
         'Employee Last Name': employee.last_name,
         'Role Name': employee.role_name,
-        'department': employee.department,
-        'salary': employee.salary,
-        'Manager': employee.manager,
+        'Department': employee.department ||"",
+        'Salary': employee.salary ||"",
+        'Manager': employee.manager ||"",
     }))
-    return consoleTable.getTable(formattedEmployees)
+    return console.table(formattedEmployees)
     }
 
     workPrompts();

@@ -1,14 +1,20 @@
+# Employee Tracker 
 
+## Summary 
+It can be such a head ache keeping track of your staff. Just hire someone new? An employee just accepted a new role? There's no way someone can keep track of all that by themselves. Now with this employee tracker, you'll be able to view all available departments, roles, and employees as well as adding new roles, employees and departments. 
 
+## Installation 
+In your command line run: 
+> npm i 
+> 
+to install the necessary dependencies. Also make sure you have a MySql account! 
 
-WHEN I choose to add a department
-THEN I am prompted to enter the name of the department and that department is added to the database
+Once you're in MySql, run: 
+> - mysql -u root -p  (You'll be prompted for your password)
+> - Once that's complete you will run: source db/schema.sql;
+> - exit mysql by entering quit;
+> 
+> - last step is to run: npm start
+>
 
-WHEN I choose to add a role
-THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
-
-WHEN I choose to add an employee
-THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
-
-WHEN I choose to update an employee role
-THEN I am prompted to select an employee to update and their new role and this information is updated in the database
+Usage: 

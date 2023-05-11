@@ -112,9 +112,9 @@ const workPrompts = () => {
                         const roleName = answers.roleName;
                         const salary = answers.salary;
                         const department = answers.department;
-                        const query = 'INSERT INTO roles (role_name, sakary, department_role) VALUES (?, ?, ?)';
+                        const query = 'INSERT INTO roles (role_name, salary, department_role) VALUES (?, ?, ?)';
 
-                        db.query(query, [roleName, salary, department], (error) =>{
+                        db.query(query, [roleName, salary, department], (error, results) =>{
                             if (error) {
                                 console.error("Couldn't add the new role, oops!", error);
                             } else {
@@ -147,7 +147,7 @@ const workPrompts = () => {
                             },
                             {
                                 type: 'input', 
-                                name: 'role', 
+                                name: 'roleName', 
                                 message: "Enter the employee's role here."
                             }, 
                             {
@@ -159,11 +159,11 @@ const workPrompts = () => {
                         .then((answers) => {
                             const firstName = answers.firstName; 
                             const lastName = answers.lastName;
-                            const role = answers.role;
+                            const role = answers.roleName;
                             const manager = answers.manager; 
                             const query = 'INSERT INTO employees (first_name, last_name, role, manager) VALUES (?, ?, ?, ?)';
                           
-                            db.query(query, [firstName, lastName, role, manager], (error) => {
+                            db.query(query, [firstName, lastName, role, manager], (error, results) => {
                               if (error) {
                                 console.error("Couldn't add the employee, oops!", error);
                               } else {
@@ -174,54 +174,55 @@ const workPrompts = () => {
                           })
                     
                         break;
-                          case 'UpdateRole': 
-                          getAllEmployees()
-                            .then((employees) => {
-                                const employeeChoices = employees.map((employee) => ({
-                                    name: `${employee.first_name} ${employee.last_name}`, 
-                                    value: employee.id,
-                                }));
-                                inquirer
+                        case 'UpdateRole':
+                            getAllEmployees()
+                                .then((employees) => {
+                                    const employeeChoices = employees.map((employee) => ({
+                                        name: `${employee.first_name} ${employee.last_name}`,
+                                        value: employee.employee_id,
+                                    }));
+                                    inquirer
                                     .prompt([
                                         {
-                                            type: 'list', 
-                                            name: 'employeeId', 
-                                            message: 'Which employee is getting a new role?'
-                                        }, 
+                                            type: 'list',
+                                            name: 'employeeId',
+                                            message: 'Which employee is getting a new role?',
+                                            choices: employeeChoices
+                                        },
                                         {
                                             type: 'input',
-                                            name: 'newRole', 
+                                            name: 'newRole',
                                             message: "What is the employee's new role?"
                                         }
                                     ])
-                                 })
-                                .then((answers) => {
-                                    const employee_id = answers.employee_id
-                                    const newRole = answers.newRole
-                                    const query = 'UPDATE employees SET role = ? WHERE id = ?';
-
-                                    db.query(query, [newRole, employeeId], (error) => {
-                                        if(error) { 
-                                            console.error("Couldn't update the employee's role, boo.", error)
-                                        } else {
-                                            console.log("You updated the employee's role, nice!")
-                                        }
-                                        workPrompts();
-                                    })
-                                })
+                                    .then((answers) => {
+                                        const employeeId = answers.employeeId;
+                                        const newRole = answers.newRole;
+                                        const query = 'UPDATE employees SET role = ? WHERE employee_id = ?';
+                    
+                                        db.query(query, [newRole, employeeId], (error) => {
+                                            if (error) {
+                                                console.error("Couldn't update the employee's role, boo.", error);
+                                            } else {
+                                                console.log("You updated the employee's role, nice!");
+                                            }
+                                            workPrompts();
+                                        });
+                                    });
+                            });
                         break;
                 case 'AddDepartment': 
                     inquirer.prompt([
                         {
                             type:'input', 
-                            name: 'departnemtName',
+                            name: 'departmentName',
                             message:"What's the name of the department you're trying to add?"
                         }
                     ])
                 .then((answers) => {
                     const departmentName = answers.departmentName;
                     const query = 'INSERT INTO departments (department_name) VALUES (?)';
-                    db.query(query, [departmentName], (error) => {
+                    db.query(query, [departmentName], (error, results) => {
                         if (error) {
                             console.error("Couldn't Add The Department, oops!", error)
                         } else {
@@ -259,7 +260,7 @@ const formatDepartmentsTable = (departments) => {
 
 const getAllRoles = () => {
     return new Promise ((resolve,reject) => {
-        const query = 'SELECT job_title, role_id, department_role, salary FROM roles'; 
+        const query = 'SELECT role_name, role_id, department_role, salary FROM roles'; 
         
         db.query(query, (error, roles) => {
             if(error) {
@@ -274,7 +275,7 @@ const getAllRoles = () => {
 const formatRolesTable = (roles) => {
     const formattedRoles = roles.map((role) => ({
         'Role ID': role.role_id,
-        'Job Title': role.job_title,
+        'Role Name': role.role_name,
         'Department Role': role.department_role,
         'Salary': role.salary,
     }))
@@ -283,7 +284,7 @@ const formatRolesTable = (roles) => {
 
 const getAllEmployees = () => {
     return new Promise ((resolve, reject) => {
-        const query = 'SELECT employee_id, first_name, last_name, job_title, department, salary, manager FROM employees'; 
+        const query = 'SELECT employee_id, first_name, last_name, role_name, department, salary, manager FROM employees'; 
 
         db.query(query, (error, employees) => {
             if(error) {
@@ -300,7 +301,7 @@ const formatEmployeesTable = employees => {
         'Employee ID': employee.employee_id, 
         'Employee First Name': employee.first_name,
         'Employee Last Name': employee.last_name,
-        'Job Title': employee.job_title,
+        'Role Name': employee.role_name,
         'department': employee.department,
         'salary': employee.salary,
         'Manager': employee.manager,

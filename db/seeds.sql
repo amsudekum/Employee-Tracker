@@ -10,5 +10,5 @@ INSERT INTO roles (role_name, salary, department_role) VALUES
 
 INSERT INTO employees (first_name, last_name, role, manager) VALUES
 ('Shuhua', 'Yeh', 'Visual', 'Cube'),
-('Miyeon', 'Cho', 'Main Vocal', 'Cube')
-('Soyeon', 'Jeon', 'Lead Writer', 'Herself')
+('Miyeon', 'Cho', 'Main Vocal', 'Cube'),
+('Soyeon', 'Jeon', 'Lead Writer', 'Herself');

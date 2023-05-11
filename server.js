@@ -89,8 +89,16 @@ const workPrompts = () => {
                         .then((roles) => {
                             const table = formatRolesTable (roles)
                             console.log(table);
-                            workPrompts
+                            workPrompts()
                         });
+                break;
+                case 'ViewEmployees': 
+                        getAllEmployees()
+                            .then((employees) => {
+                                const table = formatEmployeesTable(employees)
+                                console.log(table);
+                                workPrompts()
+                            });
                 break;
 
             }
@@ -120,7 +128,7 @@ const formatDepartmentsTable = (departments => {
 });
 
 const getAllRoles = () => {
-    return new Promoise ((resolve,reject) => {
+    return new Promise ((resolve,reject) => {
         const query = 'SELECT job_title, role_id, department_role, and salary FROM roles'; 
         
         db.query(query, (error, roles) => {
@@ -142,4 +150,32 @@ const formatRolesTable = roles => {
     }))
     return consoleTable.getTable(formattedRoles)
 }
+
+const getAllEmployees = () => {
+    return new Promise ((resolve, reject) => {
+        const query = 'SELECT employee_id, employee_firstName, employee_lastName, job_title, department, salary, manager FROM employees'; 
+
+        db.query(query, (error, employees) => {
+            if(error) {
+                reject(error)
+            }else{
+                resolve(employees)
+            }
+            })
+        })
+}
+
+const formatEmployeesTable = employees => {
+    const formattedEmployees = employees.map((employee) => ({
+        'Employee ID': employee.employee_id, 
+        'Employee First Name': employee.first_name,
+        'Employee Last Name': employee.last_name,
+        'Job Title': employee.job_title,
+        'department': employee.department,
+        'salary': employee.salary,
+        'Manager': employee.manager,
+    }))
+    return consoleTable.getTable(formattedEmployees)
+}
+
 workPrompts();

@@ -30,7 +30,7 @@ Connection.connect((error) => {
     }
 })
 
-workPrompts();
+
 const workPrompts = () => {
     inquirer
         .prompt([
@@ -41,55 +41,65 @@ const workPrompts = () => {
                 choices: [
                     {
                         name: "View All Available Departments?",
-                        value: "View Departments"
+                        value: "ViewDepartments"
                     },
                     {
                         name: "View All Available Roles?", 
-                        value: "View Roles"
+                        value: "ViewRoles"
                     },
                     {
                         name: "View All Available Employees?",
-                        value: "View Employees"
+                        value: "ViewEmployees"
                     },
                     {
                         name: "Add A New Department?",
-                        value: "Add Department"
+                        value: "AddDepartment"
                     },
                     {
                         name: "Add A New Role?",
-                        value: "Add Role"
+                        value: "AddRole"
                     },
                     {
                         name: "Add A New Employee?",
-                        value: "Add Employee"
+                        value: "AddEmployee"
                     },
                     {
                         name: "Update An Existing Employee's Role?",
-                        value: "Update Role"
+                        value: "UpdateRole"
                     }
                 ]
             }
         ])
         .then((answers) =>{
             switch (answers.choice) {
-                case 'View Departments': 
-                getAllDepartments()
-                .then((departments) => {
-                    const table = formatDepartmentsTable(departments)
-                    console.log(table)
-                    workPrompts();
+                case 'ViewDepartments': 
+                    getAllDepartments()
+                        .then((departments) => {
+                        const table = formatDepartmentsTable(departments)
+                        console.log(table)
+                        workPrompts();
                 })
                 .catch((error) => {
                     console.error('Error Getting Departments, oops', error);
                     workPrompts()
                 })
+                break;
+                case 'ViewRoles': 
+                    getAllRoles()
+                        .then((roles) => {
+                            const table = formatRolesTable (roles)
+                            console.log(table);
+                            workPrompts
+                        });
+                break;
+
             }
             })
         }
 
 const getAllDepartments = () => {
     return new Promise((resolve, reject) => {
-        const departmentPrompt = 'SELECT department_id & depeartment_name FROM available departments';
+        const query = 'SELECT department_id, department_name FROM available departments';
         
         db.query(query, (error, departments) => {
             if(error) {
@@ -108,3 +118,28 @@ const formatDepartmentsTable = (departments => {
     }))
     return consoleTable.getTable(formattedDepartments)
 });
+
+const getAllRoles = () => {
+    return new Promoise ((resolve,reject) => {
+        const query = 'SELECT job_title, role_id, department_role, and salary FROM roles'; 
+        
+        db.query(query, (error, roles) => {
+            if(error) {
+                reject(error)
+            }else {
+                resolve(roles)
+            }
+        })
+    })
+}
+
+const formatRolesTable = roles => {
+    const formattedRoles = roles.map((role) => ({
+        'Role ID': role.role_id,
+        'Job Title': role.job_title,
+        'Department Role': role.department_role,
+        'Salary': role.salary,
+    }))
+    return consoleTable.getTable(formattedRoles)
+}
+workPrompts();

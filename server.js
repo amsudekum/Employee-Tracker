@@ -9,6 +9,9 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
 const db = mysql.createConnection(
     {
@@ -19,11 +22,15 @@ const db = mysql.createConnection(
     }
 )
 
-function init () {
-    console.log("Let's get working!")
-    workPrompts();
-}
+Connection.connect((error) => {
+    if(error) {
+        console.log("Can't connect to database", error);
+    }else{
+        console.log('Connected to the database')
+    }
+})
 
+workPrompts();
 const workPrompts = () => {
     inquirer
         .prompt([
@@ -60,9 +67,44 @@ const workPrompts = () => {
                         name: "Update An Existing Employee's Role?",
                         value: "Update Role"
                     }
-
-
                 ]
             }
         ])
-}
+        .then((answers) =>{
+            switch (answers.choice) {
+                case 'View Departments': 
+                getAllDepartments()
+                .then((departments) => {
+                    const table = formatDepartmentsTable(departments)
+                    console.log(table)
+                    workPrompts();
+                })
+                .catch((error) => {
+                    console.error('Error Getting Departments, oops', error);
+                    workPrompts()
+                })
+            }
+            })
+        }
+
+const getAllDepartments = () => {
+    return new Promise((resolve, reject) => {
+        const departmentPrompt = 'SELECT department_id & depeartment_name FROM available departments';
+        
+        db.query(query, (error, departments) => {
+            if(error) {
+                reject(error)
+            }else {
+                resolve(departments);
+            }
+        })
+    })
+};
+
+const formatDepartmentsTable = (departments => {
+    const formattedDepartments = departments.map((department) => ({
+        'Department ID': department.department_id,
+        'Department Name': department.department_name,
+    }))
+    return consoleTable.getTable(formattedDepartments)
+});
